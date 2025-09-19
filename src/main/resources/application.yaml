@@ -1,25 +1,33 @@
 server:
-  port: 8761  # Default Eureka Server port
+  port: 8761
 
 spring:
   application:
-    name: muscledia-service-discovery  # Name of this service
+    name: muscledia-service-discovery
 
-# Eureka Server Configuration
 eureka:
   instance:
-    hostname: localhost  # Change this if running on a different server
-
+    hostname: ${EUREKA_HOSTNAME:localhost}
+    prefer-ip-address: true
   client:
-    register-with-eureka: false  # Eureka Server doesn't register itself
-    fetch-registry: false  # It doesn?t fetch the registry; only clients do
-
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
   server:
-    enable-self-preservation: true  # Helps keep services registered if a temporary network issue occurs
-    eviction-interval-timer-in-ms: 60000  # Interval to remove dead services (60 seconds)
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 15000
 
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: health,info,eureka
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.netflix.eureka: INFO
+    com.netflix.discovery: INFO
